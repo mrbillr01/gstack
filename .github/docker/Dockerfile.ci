@@ -1,7 +1,7 @@
 # gstack CI eval runner — pre-baked toolchain + deps
 # Built and pushed by the eval workflows' build-image job whenever its content-hash
 # tag (Dockerfile.ci, bun.lock, patches/**) is missing from the registry
-FROM ubuntu:24.04
+FROM ubuntu:26.10
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Ubicloud, so this fixes both reliability and latency. Ubuntu 24.04 uses
 # the deb822 sources format at /etc/apt/sources.list.d/ubuntu.sources.
 #
-# Using HTTP (not HTTPS) intentionally: the base ubuntu:24.04 image ships
+# Using HTTP (not HTTPS) intentionally: the base ubuntu:26.10 image ships
 # without ca-certificates, so HTTPS apt fails with "No system certificates
 # available." Apt's security model verifies via GPG-signed Release files,
 # not TLS, so HTTP here is no weaker than the upstream defaults.

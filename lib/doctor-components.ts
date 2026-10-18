@@ -101,7 +101,6 @@ export const SKILL_REQUIREMENTS: Readonly<Record<string, SkillRequirement>> = {
   'pair-agent': BROWSER,
   'open-gstack-browser': BROWSER,
   'setup-browser-cookies': BROWSER,
-  'connect-chrome': BROWSER,
   'land-and-deploy': BROWSER,
   'benchmark-models': CLAUDE_ONLY,
   careful: CLAUDE_ONLY,

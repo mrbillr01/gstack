@@ -43,7 +43,9 @@ describe('playwright-core windowsHide patch (#2160, #1989)', () => {
     // Launch spawnOptions site.
     expect(patch).toContain('+    windowsHide: true,');
     // taskkill force-kill site.
-    expect(patch).toContain('shell: true, windowsHide: true');
+    // Playwright 1.64 moved this protection into its upstream killProcessTree.
+    const bundle = fs.readFileSync(path.join(ROOT, 'node_modules', 'playwright-core', 'lib', 'coreBundle.js'), 'utf-8');
+    expect(bundle).toContain('shell: true, windowsHide: true');
   });
 
   test('bun.lock is coherent: the lockfile records the patched dependency', () => {

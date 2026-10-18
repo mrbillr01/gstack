@@ -249,7 +249,7 @@ test('existing SDK429 retry policy stays three and closes the prior query before
 
 test('late first completion cannot approve tools or overwrite evidence after a fresh second invocation', async () => {
   const result = await fixture(['late', 'success'], 250);
-  expect(result.rows.map(r => [r.passed, r.attempt])).toEqual([[false, 1], [true, 2]]);
+  expect(result.rows.map(r => [r.passed, r.attempt]), JSON.stringify(result.rows.map(r => r.error))).toEqual([[false, 1], [true, 2]]);
   expect(result.evidence[0].querySettled).toBe(0);
   expect(result.evidence[0].attemptId).not.toBe(result.evidence[1].attemptId);
   expect(result.homes[0]).not.toBe(result.homes[1]);

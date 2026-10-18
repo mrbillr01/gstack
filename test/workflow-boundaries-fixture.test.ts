@@ -23,7 +23,8 @@ for (const attack of ['read-state', 'cat-state', 'bash-edit', 'receipt-write']) 
     const input = attack === 'read-state' ? { file_path: fixture.boundary }
       : { command: attack === 'cat-state' ? `cat '${fixture.boundary}'`
         : attack === 'bash-edit' ? 'printf "arbitrary source" > src/value.js' : `printf FREEZE_RELEASED > '${fixture.receipts}'` };
-    const decision = await fixture.canUseTool(tool, input, { signal: new AbortController().signal, toolUseID: attack });
+    const decision = await fixture.canUseTool(tool, input, { signal: new AbortController().signal, toolUseID: attack, requestId: attack });
+    if (!decision) throw new Error('permission callback returned no decision');
     expect(decision.behavior).toBe('deny');
   } finally { fs.rmSync(fixture.root, { recursive: true, force: true }); }
 });
@@ -66,7 +67,7 @@ function protocolControl(id: BoundaryCase, faults: { skipCleanup?: boolean; dupl
     const ask = async (question: string, labels: string[]) => {
       const input = { questions: [{ header: 'Fixture', question, options: labels.map(label => ({ label, description: label })), multiSelect: false }] };
       await executeTool('AskUserQuestion', input);
-      return options.canUseTool!('AskUserQuestion', input, { signal: new AbortController().signal, toolUseID: `fixture-${calls}` });
+      return options.canUseTool!('AskUserQuestion', input, { signal: new AbortController().signal, toolUseID: `fixture-${calls}`, requestId: `fixture-${calls}` });
     };
     return {
       async *[Symbol.asyncIterator]() {
@@ -104,6 +105,7 @@ function protocolControl(id: BoundaryCase, faults: { skipCleanup?: boolean; dupl
           throw Object.assign(new Error('rate limit'), { status: 429 });
         }
         const decision = await ask('Continue this investigation or abort?', ['Continue', 'Abort']);
+        if (!decision) throw new Error('permission callback returned no decision');
         expect(decision.behavior).toBe('allow');
         if (decision.behavior !== 'allow') throw new Error('fixture refused its declared question');
         if (faults.duplicateQuestion) await ask('Continue this investigation or abort?', ['Continue', 'Abort']);

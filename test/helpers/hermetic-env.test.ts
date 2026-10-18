@@ -253,7 +253,7 @@ describe('getHermeticDirs lifecycle', () => {
     // tests extracting hermetic plan files with zero extractor changes.
     const dirs = getHermeticDirs();
     expect(dirs.configDir.endsWith(`${path.sep}.claude`)).toBe(true);
-    expect(dirs.configDir.startsWith(os.tmpdir())).toBe(true);
+    expect(path.resolve(dirs.configDir).startsWith(path.resolve(os.tmpdir()) + path.sep)).toBe(true);
   });
 
   test('sync singleton: repeat calls return the same dirs', () => {

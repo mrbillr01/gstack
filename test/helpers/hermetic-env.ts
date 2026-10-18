@@ -119,6 +119,11 @@ export function buildHermeticEnv(
     // Escape hatch: the legacy spread plus the updater pin.
     const legacy: Record<string, string> = {};
     for (const [k, v] of Object.entries(base)) if (v !== undefined) legacy[k] = v;
+    if (process.platform === 'win32') {
+      for (const key of Object.keys(legacy)) {
+        if (key.toUpperCase() === 'PATH' && key !== 'PATH') { legacy.PATH = legacy[key]; delete legacy[key]; }
+      }
+    }
     legacy.DISABLE_AUTOUPDATER = '1';
     for (const [k, v] of Object.entries(overrides ?? {})) if (v !== undefined) legacy[k] = v;
     return legacy;

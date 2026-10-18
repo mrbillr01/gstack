@@ -45,7 +45,8 @@ function protocol(id: ShipHookCase, fault?: Fault, deniedInspection?: string) {
       const input = { questions: [{ header: 'Hook', question: 'May I chain this unmanaged pre-push hook?', multiSelect: false,
         options: [{ label: 'Yes — install', description: 'Chain the guard.' }, { label: 'No — leave unchanged', description: 'Preserve the hook.' }] }] };
       await execute('AskUserQuestion', input);
-      const response = await options!.canUseTool!('AskUserQuestion', input, { signal: new AbortController().signal, toolUseID: 'fixture-question' });
+      const response = await options!.canUseTool!('AskUserQuestion', input, { signal: new AbortController().signal, toolUseID: 'fixture-question', requestId: 'fixture-question' });
+      if (!response) throw new Error('permission callback returned no decision');
       expect(response.behavior).toBe('allow');
       if (response.behavior !== 'allow') throw new Error('declared question was refused');
       expect(Object.values(response.updatedInput!.answers as Record<string, string>)).toEqual(['No — leave unchanged']);

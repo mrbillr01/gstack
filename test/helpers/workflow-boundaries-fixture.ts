@@ -49,7 +49,7 @@ export function createBoundaryFixture(id: BoundaryCase, root = fs.mkdtempSync(pa
   const env = {
     HOME: home, GSTACK_HOME: state, CLAUDE_PLUGIN_DATA: '', CLAUDE_CONFIG_DIR: path.join(root, 'claude-config'),
     GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null', GIT_CONFIG_NOSYSTEM: '1',
-    PATH: `${path.join(root, 'bin')}:${path.dirname(process.execPath)}:${process.env.PATH ?? '/usr/bin:/bin'}`,
+    PATH: [path.join(root, 'bin'), path.dirname(process.execPath), process.env.PATH ?? '/usr/bin:/bin'].join(path.delimiter),
   };
   const generated = read(path.join(ROOT, 'investigate/SKILL.md'));
   const scope = generated.match(/^## Scope Lock\n[\s\S]*?(?=^## )/m)?.[0];

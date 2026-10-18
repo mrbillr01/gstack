@@ -269,7 +269,8 @@ describe('cookie-import domain validation', () => {
       const result = await handleWriteCommand('cookie-import-browser', ['chromium', '--domain', '.Example.Test.', '--profile', 'Profile 2'], session, manager);
       expect(imported).toHaveBeenCalledTimes(1);
       expect(imported.mock.calls[0][0]).toMatchObject({ browser: 'chromium', domains: ['example.test'], profile: 'Profile 2' });
-      expect(imported.mock.calls[0][1]).toEqual({ page, url: currentUrl });
+      expect(imported.mock.calls[0][1]).toMatchObject({ url: currentUrl });
+      expect(imported.mock.calls[0][1]?.page === page).toBe(true);
       expect(result).toContain('Imported 2 cookies from chromium (profile: Profile 2)');
     } finally {
       imported.mockRestore();

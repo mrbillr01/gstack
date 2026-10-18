@@ -61,12 +61,12 @@ test.each(['findings', 'scope', 'DX'] as const)('actual %s classifier transport 
   const { input, judgment } = kind === 'DX' ? devexComparisonFixture() : fixture(kind);
   const originalKey = process.env.ANTHROPIC_API_KEY;
   process.env.ANTHROPIC_API_KEY = 'test-only-key';
-  const create = spyOn(Anthropic.Messages.prototype, 'create').mockImplementation(async (request: any) => ({
+  const create = spyOn(Anthropic.Messages.prototype, 'create').mockImplementation((async (request: any) => ({
     stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify({
       ...responseForPrompt(input, judgment, request.messages[0].content),
       ...(judgment.devexPeerComparison ? { devexPeerComparison: judgment.devexPeerComparison } : {}),
     }) }],
-  }) as never);
+  })) as unknown as typeof Anthropic.Messages.prototype.create);
   try {
     const result = await evaluatePlanReviewDecisions(input);
     expect(result.judgment).toEqual(judgment);
@@ -113,9 +113,9 @@ test('structured transport still rejects uncertainty and differently cased seman
       else if (invalid === 'Finding') judgment.questions[0]!.kind = invalid as never;
       else judgment.questions[0]!.optionActions[0]!.action = invalid as never;
       create.mockClear();
-      create.mockImplementation(async (request: any) => ({ stop_reason: 'end_turn', content: [{ type: 'text',
+      create.mockImplementation((async (request: any) => ({ stop_reason: 'end_turn', content: [{ type: 'text',
         text: JSON.stringify(responseForPrompt(input, judgment, request.messages[0].content)),
-      }] }) as never);
+      }] })) as unknown as typeof Anthropic.Messages.prototype.create);
       await expect(evaluatePlanReviewDecisions(input)).rejects.toThrow(invalid === 'uncertain' ? 'uncertain classification' : invalid === 'Finding' ? 'invalid judgment row' : 'invalid scope option mapping');
       expect(create).toHaveBeenCalledTimes(1);
     }

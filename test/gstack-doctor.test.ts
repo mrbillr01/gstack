@@ -121,7 +121,7 @@ function rowOf(stdout: string, name: string) {
 }
 
 /** How bash spells a directory (Git Bash on Windows prints /c/...). */
-const bashPath = (dir: string) => spawnSync('bash', ['-c', 'cd "$1" && pwd', '_', dir], { encoding: 'utf8', timeout: 10_000 }).stdout.trim();
+const bashPath = (dir: string) => spawnSync('bash', ['-c', 'cd "$1" && pwd -P', '_', dir], { encoding: 'utf8', timeout: 10_000 }).stdout.trim();
 const probeCalls = (f: Fixture) => fs.existsSync(f.probeLog) ? fs.readFileSync(f.probeLog, 'utf8') : '';
 const iso = (secondsAgo: number) => new Date(Date.now() - secondsAgo * 1000).toISOString().replace(/\.\d+Z$/, 'Z');
 const syncOn = (f: Fixture, status: Record<string, unknown>) => {

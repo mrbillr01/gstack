@@ -48,7 +48,7 @@ describe('Ubuntu fallback retains CPU architecture', () => {
         cwd: ROOT, env: { PATH: process.env.PATH, HOME: temp(), PLAYWRIGHT_HOST_PLATFORM_OVERRIDE: override }, encoding: 'utf8', timeout: 20_000,
       });
       expect(dryRun.status, dryRun.stderr).toBe(0);
-      expect(dryRun.stdout).toContain(expected === 'arm64' ? 'chromium-linux-arm64.zip' : 'chrome-linux64.zip');
+      expect(dryRun.stdout).toContain(expected === 'arm64' ? 'chrome-linux-arm64.zip' : 'chrome-linux64.zip');
       expect(dryRun.stdout).not.toContain(expected === 'arm64' ? 'chrome-linux64.zip' : 'chromium-linux-arm64.zip');
     }, 30_000);
   }

@@ -55,7 +55,8 @@ function protocol(fault?: Fault, billing?: Array<number | undefined>, controls: 
         expect(output.permissionDecision).toBe('ask');
         const normalized = { questions: (approved.questions as any[]).map(question => ({ question: question.question, header: question.header,
           options: question.options, multiSelect: question.multiSelect })) };
-        const response = await options!.canUseTool!(tool, normalized, { signal: new AbortController().signal, toolUseID: id });
+        const response = await options!.canUseTool!(tool, normalized, { signal: new AbortController().signal, toolUseID: id, requestId: id });
+        if (!response) throw new Error('permission callback returned no decision');
         failed = response.behavior !== 'allow';
         if (response.behavior === 'allow') {
           expect(Object.values(response.updatedInput!.answers as Record<string, string>)).toEqual(['Skip']);
@@ -104,7 +105,7 @@ function protocol(fault?: Fault, billing?: Array<number | undefined>, controls: 
           expect(old.root).not.toBe(root);
           expect(fs.existsSync(old.root)).toBe(true);
           const prior = fs.readFileSync(path.join(old.root, 'owner-answer.json'), 'utf8');
-          const denied = await old.options!.canUseTool!('AskUserQuestion', { questions: [] }, { signal: new AbortController().signal, toolUseID: 'late-old-question' });
+          const denied = await old.options!.canUseTool!('AskUserQuestion', { questions: [] }, { signal: new AbortController().signal, toolUseID: 'late-old-question', requestId: 'late-old-question' });
           expect(denied).toMatchObject({ behavior: 'deny', message: 'Attempt is closed or expired' });
           const blocked = await old.options!.hooks!.PreToolUse![0].hooks[0]({ hook_event_name: 'PreToolUse', tool_name: 'Write',
             tool_input: { file_path: path.join(old.root, 'review-record.json'), content: 'late old attempt' }, tool_use_id: 'late-old-write',
@@ -293,7 +294,7 @@ test('stream closure rejects late callbacks and retains its root until iterator 
           const root = path.dirname(args.options!.cwd!);
           expect(fs.existsSync(root)).toBe(true);
           await new Promise(resolve => setTimeout(resolve, 25));
-          const answer = await args.options!.canUseTool!('AskUserQuestion', {}, { toolUseID: 'during-drain', signal: new AbortController().signal });
+          const answer = await args.options!.canUseTool!('AskUserQuestion', {}, { toolUseID: 'during-drain', requestId: 'during-drain', signal: new AbortController().signal });
           expect(answer).toMatchObject({ behavior: 'deny', message: 'Attempt is closed or expired' });
           expect(fs.existsSync(root)).toBe(true);
           const result = await iterator.return?.();

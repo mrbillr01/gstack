@@ -28,8 +28,13 @@ const input = { hook_event_name: 'PreToolUse', session_id: 'parent', cwd: ROOT,
   transcript_path: path.join(ROOT, 'missing-config/projects/project/parent.jsonl'), tool_name: 'Read',
   tool_use_id: 'current', tool_input: { file_path: path.join(ROOT, 'autoplan/sections/design-phase.md') } };
 function run(bytes: string, shim = SHIM, env = process.env) {
+  const inheritedPath = Object.entries(env).find(([key]) => key.toUpperCase() === 'PATH')?.[1] ?? '';
+  const childEnv: NodeJS.ProcessEnv = { ...env, PATH: `${path.dirname(process.execPath)}${path.delimiter}${inheritedPath}` };
+  if (process.platform === 'win32') {
+    for (const key of Object.keys(childEnv)) if (key !== 'PATH' && key.toUpperCase() === 'PATH') delete childEnv[key];
+  }
   const child = spawnSync('bash', [shim], { input: bytes, encoding: 'utf8', timeout: 8_000,
-    env: { ...env, PATH: `${path.dirname(process.execPath)}:${env.PATH ?? ''}` } });
+    env: childEnv });
   expect(child.signal).toBeNull(); expect(child.stdout.trim().split('\n')).toHaveLength(1);
   return { child, output: JSON.parse(child.stdout) };
 }

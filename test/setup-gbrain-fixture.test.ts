@@ -260,7 +260,7 @@ describe('setup-gbrain owned Path 4 fixture', () => {
               get apiKeySource(): never { throw new Error('private init credential field accessed'); } };
             const questions = [{ question: 'Want symbol-aware code search?', options: [{ label: 'Yes, local PGLite' }] }];
             await input.options!.canUseTool!('AskUserQuestion', { questions }, {
-              signal: new AbortController().signal, toolUseID: 'fixture-question',
+              signal: new AbortController().signal, toolUseID: 'fixture-question', requestId: 'fixture-question',
             });
             yield { type: 'assistant', message: { content: [privateBlock,
               { type: 'text', text: `synthetic diagnostic ${fixture.token} ${credentialUrl}` },
